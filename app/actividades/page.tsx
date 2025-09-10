@@ -34,7 +34,7 @@ export default async function ActividadesPage() {
       <main className="min-h-screen p-4 sm:p-6 lg:p-10 bg-background text-foreground">
         <div className="container max-w-6xl mx-auto py-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">Error de Contenido</h1>
-          <p className="text-center">No se pudo encontrar el archivo de contenido para esta página. Asegúrate de que "actividades.md" esté en la carpeta "content" en la raíz de tu proyecto.</p>
+          <p className="text-center">No se pudo encontrar el archivo de contenido para esta página. Asegúrate de que actividades.md esté en la carpeta content en la raíz de tu proyecto.</p>
         </div>
       </main>
     );
