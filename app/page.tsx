@@ -11,6 +11,7 @@ export default function Home() {
     <main className="min-h-screen flex items-center justify-center p-4 bg-background text-foreground">
       <div className="main-wrapper w-full max-w-6xl xl:max-w-7xl px-4 py-8 sm:px-6 sm:py-10 bg-card rounded-xl shadow-2xl transition-all duration-500 ease-in-out">
         <div className="header flex flex-col items-center mb-6">
+          <a href="/reporte" target="_blank" rel="noopener noreferrer" className="flex items-center mb-4">
           <Image
             src={veranologo}
             alt="Company logo"
@@ -18,10 +19,11 @@ export default function Home() {
             height={120}
             className="rounded-full shadow-lg"
           />
+          </a>
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-2 leading-tight">
-          General Report: Verano en Cadena
+          General Report - Frutero Club
         </h1>
         <h2 className="text-xl sm:text-2xl font-light text-center mb-10 text-muted-foreground">
           Mexico City (2025)

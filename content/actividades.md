@@ -6,9 +6,6 @@ Este reporte analiza los datos de los 46 solicitantes registrados para el progra
 
 
 
-
-
-
 ## Perfil de los Participantes
 
 El grupo de solicitantes está formado por **46 proyectos** de diversas ubicaciones geográficas. Los países con mayor representación son **México, Perú, Chile, Colombia, Argentina y Ecuador**, lo que indica un amplio alcance en la región latinoamericana.
