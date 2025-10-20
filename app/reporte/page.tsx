@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { getMarkdownTemplate, reportTypes, ReportType } from './utils/templates';
 import Footer from './components/Footer';
 import Header from './components/Header';
@@ -17,6 +18,7 @@ import ManualInput from './components/ManualInputFinal';
 const veranologo = "https://red-causal-armadillo-397.mypinata.cloud/ipfs/bafkreiejgeokgt62gygh3e3frfm5e6xjmjyallf4ixpvv3nchh2uu4my7u";
 
 export default function UploadReport() {
+  const router = useRouter();
   const [reportType, setReportType] = useState<ReportType | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'drag' | 'manual' | null>(null);
@@ -24,6 +26,7 @@ export default function UploadReport() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [manualText, setManualText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSavingToDb, setIsSavingToDb] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
@@ -103,17 +106,176 @@ export default function UploadReport() {
   };
 
   const handleSubmit = async () => {
+    if (!manualText.trim() && !uploadedFile) {
+      alert('⚠️ Por favor ingresa contenido o sube un archivo antes de enviar');
+      return;
+    }
+
     setIsProcessing(true);
-    
-    // Simulate processing time
-    setTimeout(() => {
+
+    try {
+      let contentToSave = manualText;
+
+      // Si hay un archivo subido, leer su contenido
+      if (uploadedFile) {
+        const fileContent = await uploadedFile.text();
+        contentToSave = fileContent + (manualText ? '\n\n' + manualText : '');
+      }
+
+      // Enviar a la API para guardar
+      const response = await fetch('/api/save-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: contentToSave,
+          reportType: getReportTypeLabel(),
+          reportTypeValue: reportType, // Enviar el valor del tipo ('frutero', 'evento', 'cualitativo')
+          appendMode: false // Reemplazar el archivo existente
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Determinar la página de destino según el tipo de reporte
+        let redirectPath = '/actividades'; // default
+        let pageName = 'actividades';
+
+        if (reportType === 'frutero') {
+          redirectPath = '/actividades';
+          pageName = 'actividades';
+        } else if (reportType === 'evento') {
+          redirectPath = '/analisis';
+          pageName = 'análisis';
+        } else if (reportType === 'cualitativo') {
+          redirectPath = '/cualitativo';
+          pageName = 'cualitativo';
+        }
+
+        alert(`✅ ${getReportTypeLabel()} guardado exitosamente!\n\nSerás redirigido a la página de ${pageName} para ver tu reporte.`);
+
+        // Redirigir a la página correspondiente después de 1 segundo
+        setTimeout(() => {
+          router.push(redirectPath);
+        }, 1000);
+      } else {
+        throw new Error(data.error || 'Error al guardar el reporte');
+      }
+    } catch (error: any) {
+      console.error('❌ Error al guardar el reporte:', error);
+      alert('❌ Error al guardar el reporte:\n\n' + error.message);
+    } finally {
       setIsProcessing(false);
-      // Here you would typically process the file or text
-      console.log('Report type:', reportType);
-      console.log('File:', uploadedFile);
-      console.log('Manual text:', manualText);
-      alert(`${getReportTypeLabel()} procesado exitosamente!`);
-    }, 2000);
+    }
+  };
+
+  // Función para guardar en la base de datos PostgreSQL
+  const handleSaveToDatabase = async () => {
+    if (!manualText.trim() && !uploadedFile) {
+      alert('⚠️ Por favor ingresa contenido o sube un archivo antes de guardar');
+      return;
+    }
+
+    if (!reportType) {
+      alert('⚠️ Por favor selecciona un tipo de reporte');
+      return;
+    }
+
+    setIsSavingToDb(true);
+
+    try {
+      let contentToSave = manualText;
+
+      // Si hay un archivo subido, leer su contenido
+      if (uploadedFile) {
+        const fileContent = await uploadedFile.text();
+        contentToSave = fileContent + (manualText ? '\n\n' + manualText : '');
+      }
+
+      // Preparar datos para la base de datos
+      const reportData = {
+        reportType: reportType,
+        title: `${getReportTypeLabel()} - ${new Date().toLocaleDateString('es-MX')}`,
+        content: contentToSave,
+        metadata: {
+          createdVia: 'web-interface',
+          fileAttached: !!uploadedFile,
+          aiAssisted: aiPrompt ? true : false,
+        },
+        attachments: attachedFiles.map(f => ({
+          name: f.name,
+          size: f.size,
+          type: f.type,
+        })),
+        isAiGenerated: aiPrompt ? 'true' : 'false',
+        aiModel: aiPrompt ? 'gemini-2.0-flash-exp' : null,
+        aiPrompt: aiPrompt || null,
+      };
+
+      // Enviar a la API de base de datos
+      const response = await fetch('/api/save-report-db', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // También guardar en el archivo .md para visualización
+        const fileResponse = await fetch('/api/save-report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: contentToSave,
+            reportType: getReportTypeLabel(),
+            reportTypeValue: reportType,
+            appendMode: false
+          }),
+        });
+
+        const fileData = await fileResponse.json();
+
+        if (fileData.success) {
+          // Determinar la página de destino según el tipo de reporte
+          let redirectPath = '/actividades';
+          let pageName = 'actividades';
+
+          if (reportType === 'frutero') {
+            redirectPath = '/actividades';
+            pageName = 'actividades';
+          } else if (reportType === 'evento') {
+            redirectPath = '/analisis';
+            pageName = 'análisis';
+          } else if (reportType === 'cualitativo') {
+            redirectPath = '/cualitativo';
+            pageName = 'cualitativo';
+          }
+
+          alert(`✅ ${getReportTypeLabel()} guardado exitosamente!\n\n📊 ID del reporte: ${data.reportId}\n📁 Archivo: ${fileData.fileName}\n\nSerás redirigido a la página de ${pageName} para ver tu reporte.`);
+
+          // Redirigir después de 1 segundo
+          setTimeout(() => {
+            router.push(redirectPath);
+          }, 1000);
+        } else {
+          alert(`✅ Guardado en BD (ID: ${data.reportId})\n\n⚠️ Advertencia: No se pudo guardar en archivo .md\n\nPero puedes verlo en la base de datos.`);
+        }
+      } else {
+        throw new Error(data.error || 'Error al guardar en la base de datos');
+      }
+    } catch (error: any) {
+      console.error('❌ Error al guardar en la base de datos:', error);
+      alert('❌ Error al guardar en la base de datos:\n\n' + error.message);
+    } finally {
+      setIsSavingToDb(false);
+    }
   };
 
   const resetUpload = () => {
@@ -124,6 +286,7 @@ export default function UploadReport() {
     setAiPrompt('');
     setAttachedFiles([]);
     setIsProcessing(false);
+    setIsSavingToDb(false);
     setIsAiProcessing(false);
     setIsDropdownOpen(false);
   };
@@ -177,41 +340,98 @@ export default function UploadReport() {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // 🚀 Llamada a Gemini API
   const handleAiSubmit = async () => {
-    if (!aiPrompt.trim()) return;
-    
+    if (!aiPrompt.trim()) {
+      alert('⚠️ Por favor escribe una consulta para la IA');
+      return;
+    }
+
     setIsAiProcessing(true);
-    
-    // Simulate AI processing
-    setTimeout(() => {
-      setIsAiProcessing(false);
-      
-      // Generate AI response based on prompt and report type
-      const aiResponse = generateAiResponse(aiPrompt, reportType);
-      
-      // Add AI response to the manual text area
-      setManualText(prev => {
-        if (prev.trim()) {
-          return prev + '\n\n' + aiResponse;
-        }
-        return aiResponse;
+
+    try {
+      // Preparar metadatos de archivos adjuntos
+      const filesMetadata = attachedFiles.map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type
+      }));
+
+      // Construir contexto del tipo de reporte
+      const reportContext = reportType
+        ? `\nContexto: El usuario está trabajando en un reporte de tipo "${getReportTypeLabel()}".`
+        : '';
+
+      // Llamada a la API de Gemini
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: aiPrompt + reportContext,
+          files: filesMetadata,
+          reportType: reportType
+        }),
       });
-      
-      // Clear AI prompt but keep files for reference
-      setAiPrompt('');
-      
-      // Show success message
-      alert('✨ IA ha generado contenido para tu reporte. Revisa el área de texto abajo.');
-    }, 2000);
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.response) {
+        // Formatear la respuesta de la IA
+        const aiResponse = formatAiResponse(data.response, aiPrompt);
+        
+        // Agregar respuesta al área de texto manual
+        setManualText(prev => {
+          if (prev.trim()) {
+            return prev + '\n\n---\n\n' + aiResponse;
+          }
+          return aiResponse;
+        });
+        
+        // Limpiar el prompt
+        setAiPrompt('');
+        
+        // Mostrar notificación de éxito
+        alert('✨ ¡La IA ha generado contenido para tu reporte!\n\nRevisa el área de texto para ver las sugerencias.');
+      } else {
+        throw new Error(data.error || 'Error al procesar la respuesta');
+      }
+    } catch (error: any) {
+      console.error('❌ Error al llamar a Gemini API:', error);
+
+      // Mensajes de error específicos
+      if (error.message.includes('API Key')) {
+        alert('⚠️ Error de configuración: La API Key de Gemini no está configurada correctamente.\n\nVerifica tu archivo .env.local');
+      } else if (error.message.includes('HTTP: 500')) {
+        alert('⚠️ Error del servidor: Verifica que la API Key sea válida y tenga permisos.');
+      } else {
+        alert('❌ Error al conectar con la IA:\n\n' + error.message + '\n\nIntenta nuevamente.');
+      }
+    } finally {
+      setIsAiProcessing(false);
+    }
   };
 
-  const generateAiResponse = (prompt: string, type: ReportType | null) => {
-    // Simple AI response simulation based on prompt keywords and report type
-    let response = '';
-    if (!response) {
-      response = `\n## Respuesta de IA\n\nBasado en tu consulta: "${prompt}"\n\n*La IA está procesando tu solicitud y generará contenido específico para tu ${type || 'reporte'}...*\n\n`;
-    }
-    return response;
+  // 🎨 Función para formatear la respuesta de la IA
+  const formatAiResponse = (aiText: string, originalPrompt: string): string => {
+    const timestamp = new Date().toLocaleString('es-MX', {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    });
+
+    return `## 🤖 Respuesta de Gemini AI
+**Consulta realizada:** ${originalPrompt}
+**Fecha:** ${timestamp}
+
+${aiText}
+
+---
+*Generado por Gemini 2.0 Flash*`;
   };
 
   return (
@@ -288,6 +508,8 @@ export default function UploadReport() {
             manualText={manualText}
             handleSubmit={handleSubmit}
             isProcessing={isProcessing}
+            handleSaveToDatabase={handleSaveToDatabase}
+            isSavingToDb={isSavingToDb}
             setUploadMethod={setUploadMethod}
           />
         )}

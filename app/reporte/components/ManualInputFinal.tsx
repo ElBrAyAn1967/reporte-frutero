@@ -20,6 +20,8 @@ interface ManualInputProps {
   manualText: string;
   handleSubmit: () => void;
   isProcessing: boolean;
+  handleSaveToDatabase: () => void;
+  isSavingToDb: boolean;
   setUploadMethod: (method: 'drag' | 'manual' | null) => void;
 }
 
@@ -40,6 +42,8 @@ export default function ManualInput({
   manualText,
   handleSubmit,
   isProcessing,
+  handleSaveToDatabase,
+  isSavingToDb,
   setUploadMethod
 }: ManualInputProps) {
   return (
@@ -94,11 +98,11 @@ export default function ManualInput({
       </div>
 
       {manualText.trim() && (
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <button
             onClick={handleSubmit}
-            disabled={isProcessing}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-80 transition-all duration-200 font-medium disabled:opacity-50"
+            disabled={isProcessing || isSavingToDb}
+            className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-80 transition-all duration-200 font-medium disabled:opacity-50"
           >
             {isProcessing ? (
               <>
@@ -112,9 +116,29 @@ export default function ManualInput({
               </>
             )}
           </button>
+
+          <button
+            onClick={handleSaveToDatabase}
+            disabled={isProcessing || isSavingToDb}
+            className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium disabled:opacity-50 shadow-md"
+          >
+            {isSavingToDb ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+                Guardando en BD...
+              </>
+            ) : (
+              <>
+                <i className="fas fa-database mr-2"></i>
+                Guardar en Base de Datos
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => setUploadMethod(null)}
-            className="px-6 py-3 border border-muted-foreground/30 text-foreground rounded-lg hover:bg-muted transition-all duration-200 font-medium"
+            disabled={isProcessing || isSavingToDb}
+            className="w-full sm:w-auto px-6 py-3 border border-muted-foreground/30 text-foreground rounded-lg hover:bg-muted transition-all duration-200 font-medium disabled:opacity-50"
           >
             <i className="fas fa-arrow-left mr-2"></i>
             Cambiar método
