@@ -439,7 +439,7 @@ ${aiText}
       <div className="main-wrapper w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10 bg-card rounded-xl shadow-2xl transition-all duration-500 ease-in-out">
         
         {/* Header */}
-        <Header veranologo={veranologo} />
+        <Header />
 
         <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-2 leading-tight">
           {getReportTypeLabel()}
@@ -526,7 +526,7 @@ ${aiText}
         </div>
 
         {/* Footer */}
-        <Footer veranologo={veranologo} />
+        <Footer />
       </div>
     </main>
   );

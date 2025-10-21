@@ -143,10 +143,10 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
 
     let query = db.select().from(reports);
-
+    
     // Filtrar por tipo si se proporciona
     if (reportType) {
-      query = query.where(eq(reports.reportType, reportType));
+      query = query.where(eq(reports.reportType, reportType)) as any;
     }
 
     const allReports = await query.limit(limit);
