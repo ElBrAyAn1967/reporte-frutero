@@ -226,47 +226,27 @@ export default function UploadReport() {
       const data = await response.json();
 
       if (data.success) {
-        // También guardar en el archivo .md para visualización
-        const fileResponse = await fetch('/api/save-report', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            content: contentToSave,
-            reportType: getReportTypeLabel(),
-            reportTypeValue: reportType,
-            appendMode: false
-          }),
-        });
+        // Determinar la página de destino según el tipo de reporte
+        let redirectPath = '/actividades';
+        let pageName = 'actividades';
 
-        const fileData = await fileResponse.json();
-
-        if (fileData.success) {
-          // Determinar la página de destino según el tipo de reporte
-          let redirectPath = '/actividades';
-          let pageName = 'actividades';
-
-          if (reportType === 'frutero') {
-            redirectPath = '/actividades';
-            pageName = 'actividades';
-          } else if (reportType === 'evento') {
-            redirectPath = '/analisis';
-            pageName = 'análisis';
-          } else if (reportType === 'cualitativo') {
-            redirectPath = '/cualitativo';
-            pageName = 'cualitativo';
-          }
-
-          alert(`✅ ${getReportTypeLabel()} guardado exitosamente!\n\n📊 ID del reporte: ${data.reportId}\n📁 Archivo: ${fileData.fileName}\n\nSerás redirigido a la página de ${pageName} para ver tu reporte.`);
-
-          // Redirigir después de 1 segundo
-          setTimeout(() => {
-            router.push(redirectPath);
-          }, 1000);
-        } else {
-          alert(`✅ Guardado en BD (ID: ${data.reportId})\n\n⚠️ Advertencia: No se pudo guardar en archivo .md\n\nPero puedes verlo en la base de datos.`);
+        if (reportType === 'frutero') {
+          redirectPath = '/actividades';
+          pageName = 'actividades';
+        } else if (reportType === 'evento') {
+          redirectPath = '/analisis';
+          pageName = 'análisis';
+        } else if (reportType === 'cualitativo') {
+          redirectPath = '/cualitativo';
+          pageName = 'cualitativo';
         }
+
+        alert(`✅ ${getReportTypeLabel()} guardado exitosamente!\n\n📊 ID del reporte: ${data.reportId}\n\nSerás redirigido a la página de ${pageName} para ver tu reporte.`);
+
+        // Redirigir después de 1 segundo
+        setTimeout(() => {
+          router.push(redirectPath);
+        }, 1000);
       } else {
         throw new Error(data.error || 'Error al guardar en la base de datos');
       }
