@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { remark } from 'remark';
 import html from 'remark-html';
+import Navbar from '@/components/layout/navbar';
+import Footer from '@/components/layout/footer';
 
 interface ReportPageTemplateProps {
   reportType: 'frutero' | 'evento' | 'cualitativo';
@@ -69,101 +71,116 @@ export default function ReportPageTemplate({
 
   if (loading) {
     return (
-      <main className="min-h-screen p-4 sm:p-6 lg:p-10 bg-background text-foreground">
-        <div className="container max-w-6xl mx-auto py-8">
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500 mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Cargando reporte...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground font-grotesk">Cargando reporte...</p>
           </div>
-        </div>
-      </main>
+        </main>
+        <Footer />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen p-4 sm:p-6 lg:p-10 bg-background text-foreground">
-        <div className="container max-w-6xl mx-auto py-8">
-          <div className="text-center">
-            <i className="fas fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-4">
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="container max-w-2xl mx-auto text-center">
+            <i className="fas fa-exclamation-triangle text-6xl text-destructive mb-6"></i>
+            <h1 className="mb-4">
               Error al cargar el reporte
             </h1>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-8 font-grotesk">
               {error}
             </p>
             <a
               href={createRoute}
-              className="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-full text-lg font-medium shadow-lg hover:bg-primary/90 transition-all duration-300 hover:scale-105"
             >
-              <i className="fas fa-plus mr-2"></i>
+              <i className="fas fa-plus mr-3"></i>
               Crear nuevo reporte
             </a>
           </div>
-        </div>
-      </main>
+        </main>
+        <Footer />
+      </div>
     );
   }
 
   if (!report) {
     return (
-      <main className="min-h-screen p-4 sm:p-6 lg:p-10 bg-background text-foreground">
-        <div className="container max-w-6xl mx-auto py-8">
-          <div className="text-center">
-            <i className="fas fa-file-alt text-6xl text-gray-400 mb-4"></i>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-4">
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="container max-w-2xl mx-auto text-center">
+            <i className="fas fa-file-alt text-6xl text-muted mb-6"></i>
+            <h1 className="mb-4">
               No hay reportes de {reportLabel.toLowerCase()} disponibles
             </h1>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-8 font-grotesk">
               Aún no has generado ningún reporte de {reportLabel.toLowerCase()}.
               Ve a la página de reportes para crear uno.
             </p>
             <a
               href={createRoute}
-              className="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-full text-lg font-medium shadow-lg hover:bg-primary/90 transition-all duration-300 hover:scale-105"
             >
-              <i className="fas fa-plus mr-2"></i>
+              <i className="fas fa-plus mr-3"></i>
               Crear reporte de {reportLabel.toLowerCase()}
             </a>
           </div>
-        </div>
-      </main>
+        </main>
+        <Footer />
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen p-4 sm:p-6 lg:p-10 bg-background text-foreground">
-      <div className="container max-w-6xl mx-auto py-8">
-        {report.isAiGenerated === 'true' && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <div className="flex items-center gap-2">
-              <i className="fas fa-robot text-green-600 dark:text-green-400"></i>
-              <span className="text-green-700 dark:text-green-300 font-medium">
-                Reporte {reportLabel.toLowerCase()} generado con IA
-              </span>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
 
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <i className="fas fa-database text-blue-600 dark:text-blue-400"></i>
-              <span className="text-blue-700 dark:text-blue-300 font-medium">
-                Cargado desde base de datos
+      <main className="flex-1 p-4 sm:p-6 lg:p-10">
+        <div className="container max-w-6xl mx-auto py-8">
+          {/* Badges informativos */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            {report.isAiGenerated === 'true' && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border-2 border-accent rounded-full">
+                <i className="fas fa-robot text-accent"></i>
+                <span className="text-accent font-medium font-grotesk text-sm">
+                  Generado con IA
+                </span>
+              </div>
+            )}
+
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border-2 border-primary rounded-full">
+              <i className="fas fa-database text-primary"></i>
+              <span className="text-primary font-medium font-grotesk text-sm">
+                Base de Datos
               </span>
             </div>
-            <span className="text-sm text-blue-600 dark:text-blue-400">
-              Creado: {new Date(report.createdAt).toLocaleString('es-MX', {
-                dateStyle: 'long',
-                timeStyle: 'short'
-              })}
-            </span>
+
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/30 border-2 border-border rounded-full ml-auto">
+              <i className="fas fa-calendar text-muted-foreground"></i>
+              <span className="text-muted-foreground font-grotesk text-sm">
+                {new Date(report.createdAt).toLocaleDateString('es-MX', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+            </div>
           </div>
+
+          {/* Contenido del reporte */}
+          <div className="report-content-wrapper" dangerouslySetInnerHTML={{ __html: contentHtml }} />
         </div>
+      </main>
 
-        <div className="report-content-wrapper" dangerouslySetInnerHTML={{ __html: contentHtml }} />
-      </div>
-    </main>
+      <Footer />
+    </div>
   );
 }
