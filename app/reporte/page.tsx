@@ -2,9 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getMarkdownTemplate, reportTypes, ReportType } from './utils/templates';
+import { reportTypes, ReportType } from './utils/templates';
 import Footer from './components/Footer';
 import Header from './components/Header';
 
@@ -14,8 +13,7 @@ import BreadcrumbNavigation from './components/BreadcrumNavigationFinal';
 import MethodSelector from './components/MethodSelectorFinal';
 import FileUpload from './components/FileUploadFinal';
 import ManualInput from './components/ManualInputFinal';
-
-const veranologo = "https://red-causal-armadillo-397.mypinata.cloud/ipfs/bafkreiejgeokgt62gygh3e3frfm5e6xjmjyallf4ixpvv3nchh2uu4my7u";
+import ProtocoloSelector from './components/ProtocoloSelector';
 
 export default function UploadReport() {
   const router = useRouter();
@@ -30,6 +28,9 @@ export default function UploadReport() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [selectedProtocolo, setSelectedProtocolo] = useState<string | null>(null);
+  const [customProtocolo, setCustomProtocolo] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -183,6 +184,12 @@ export default function UploadReport() {
       return;
     }
 
+    // Validar protocolo
+    if (!selectedProtocolo && !customProtocolo.trim()) {
+      alert('⚠️ Por favor selecciona o ingresa un protocolo/evento');
+      return;
+    }
+
     setIsSavingToDb(true);
 
     try {
@@ -195,14 +202,18 @@ export default function UploadReport() {
       }
 
       // Preparar datos para la base de datos
+      const finalProtocolo = customProtocolo.trim() || selectedProtocolo;
       const reportData = {
         reportType: reportType,
-        title: `${getReportTypeLabel()} - ${new Date().toLocaleDateString('es-MX')}`,
+        protocolo: finalProtocolo,
+        protocoloCustom: customProtocolo.trim() || null,
+        title: `${getReportTypeLabel()} - ${finalProtocolo} - ${new Date().toLocaleDateString('es-MX')}`,
         content: contentToSave,
         metadata: {
           createdVia: 'web-interface',
           fileAttached: !!uploadedFile,
           aiAssisted: aiPrompt ? true : false,
+          protocolo: finalProtocolo,
         },
         attachments: attachedFiles.map(f => ({
           name: f.name,
@@ -265,6 +276,9 @@ export default function UploadReport() {
     setManualText('');
     setAiPrompt('');
     setAttachedFiles([]);
+    setSelectedProtocolo(null);
+    setCustomProtocolo('');
+    setShowCustomInput(false);
     setIsProcessing(false);
     setIsSavingToDb(false);
     setIsAiProcessing(false);
@@ -447,8 +461,22 @@ ${aiText}
           getReportTypeLabel={getReportTypeLabel}
         />
 
-        {/* Method Selection */}
+        {/* Protocolo Selector - Mostrar después de seleccionar tipo de reporte */}
         {reportType && !uploadMethod && (
+          <div className="mb-8">
+            <ProtocoloSelector
+              selectedProtocolo={selectedProtocolo}
+              customProtocolo={customProtocolo}
+              onSelectProtocolo={setSelectedProtocolo}
+              onCustomProtocoloChange={setCustomProtocolo}
+              showCustomInput={showCustomInput}
+              setShowCustomInput={setShowCustomInput}
+            />
+          </div>
+        )}
+
+        {/* Method Selection - Mostrar solo después de seleccionar protocolo */}
+        {reportType && !uploadMethod && (selectedProtocolo || customProtocolo.trim()) && (
           <MethodSelector setUploadMethod={setUploadMethod} />
         )}
 

@@ -7,6 +7,12 @@ export const reports = pgTable('reports', {
   // Tipo de reporte: 'frutero', 'evento', 'cualitativo'
   reportType: varchar('report_type', { length: 50 }).notNull(),
 
+  // Protocolo/Evento al que pertenece el reporte
+  protocolo: varchar('protocolo', { length: 100 }),
+
+  // Si el protocolo fue ingresado manualmente por el usuario
+  protocoloCustom: varchar('protocolo_custom', { length: 100 }),
+
   // Título del reporte
   title: text('title').notNull(),
 

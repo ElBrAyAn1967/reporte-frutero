@@ -9,8 +9,7 @@ export async function GET() {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-
+    // API key validado - modelos disponibles
     // Lista de modelos disponibles (información estática actualizada)
     const availableModels = [
       {

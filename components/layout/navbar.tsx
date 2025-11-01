@@ -16,7 +16,7 @@ const MENU_ITEMS: MenuItemType[] = [
   { displayText: 'actividades', href: '/actividades', isMobileOnly: false },
   { displayText: 'análisis', href: '/analisis', isMobileOnly: false },
   { displayText: 'cualitativo', href: '/cualitativo', isMobileOnly: false },
-  { displayText: 'subir reporte', href: '/reporte', isMobileOnly: false },
+  { displayText: 'eventos', href: '/eventos', isMobileOnly: false },
 ];
 
 export default function Navbar() {

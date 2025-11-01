@@ -1,0 +1,277 @@
+{
+  "id": "ec5c73d2-c6aa-4511-8d90-cdddb404ee37",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.reports": {
+      "name": "reports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "report_type": {
+          "name": "report_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protocolo": {
+          "name": "protocolo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "protocolo_custom": {
+          "name": "protocolo_custom",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kit_actividades": {
+          "name": "kit_actividades",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "manuales_guias": {
+          "name": "manuales_guias",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hub_participantes": {
+          "name": "hub_participantes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metricas_sesiones": {
+          "name": "metricas_sesiones",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ranking_sesiones": {
+          "name": "ranking_sesiones",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "distribucion_region": {
+          "name": "distribucion_region",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "analisis_geografico": {
+          "name": "analisis_geografico",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "descripcion_general": {
+          "name": "descripcion_general",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reporte_analisis_tecnico": {
+          "name": "reporte_analisis_tecnico",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categorias_proyectos": {
+          "name": "categorias_proyectos",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actividades_principales": {
+          "name": "actividades_principales",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mentorias": {
+          "name": "mentorias",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "obstaculos_comunes": {
+          "name": "obstaculos_comunes",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "patrocinadores": {
+          "name": "patrocinadores",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recomendaciones_estrategicas": {
+          "name": "recomendaciones_estrategicas",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "desafios_aprendizajes": {
+          "name": "desafios_aprendizajes",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "testimonios": {
+          "name": "testimonios",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datos_participantes": {
+          "name": "datos_participantes",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "habilidades_clave": {
+          "name": "habilidades_clave",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "experiencia_previa_blockchain": {
+          "name": "experiencia_previa_blockchain",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tecnologias_ocupadas": {
+          "name": "tecnologias_ocupadas",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aspectos_valorados": {
+          "name": "aspectos_valorados",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "impacto_percibido": {
+          "name": "impacto_percibido",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conclusiones_aprendizajes": {
+          "name": "conclusiones_aprendizajes",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        },
+        "attachments": {
+          "name": "attachments",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_ai_generated": {
+          "name": "is_ai_generated",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'false'"
+        },
+        "ai_model": {
+          "name": "ai_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ai_prompt": {
+          "name": "ai_prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

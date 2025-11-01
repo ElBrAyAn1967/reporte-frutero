@@ -19,6 +19,7 @@ interface Report {
   content: string;
   createdAt: string;
   isAiGenerated: string;
+  protocolo?: string;
 }
 
 export default function ReportPageTemplate({
@@ -147,6 +148,15 @@ export default function ReportPageTemplate({
         <div className="container max-w-6xl mx-auto py-8">
           {/* Badges informativos */}
           <div className="flex flex-wrap gap-3 mb-6">
+            {report.protocolo && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border-2 border-blue-500 rounded-full">
+                <i className="fas fa-calendar-alt text-blue-500"></i>
+                <span className="text-blue-500 font-medium font-grotesk text-sm">
+                  {report.protocolo}
+                </span>
+              </div>
+            )}
+
             {report.isAiGenerated === 'true' && (
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border-2 border-accent rounded-full">
                 <i className="fas fa-robot text-accent"></i>

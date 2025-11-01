@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/client';
 import { reports } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { processText } from '@/lib/text-processor';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
       reportType,
+      protocolo,
+      protocoloCustom,
       title,
       content,
       userId,
@@ -69,13 +72,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 🤖 Procesar el contenido inteligentemente
+    console.log('📝 Procesando contenido del reporte...');
+    const processedContent = processText(content, reportType, {
+      detectTitles: true,
+      detectLists: true,
+      detectSections: true,
+      detectEmphasis: true,
+      detectTables: true,
+      preserveMarkdown: true,
+    });
+
+    console.log(`✓ Contenido procesado: ${content.length} → ${processedContent.length} caracteres`);
+
     // Insertar en la base de datos
     const [newReport] = await db
       .insert(reports)
       .values({
         reportType,
+        protocolo: protocoloCustom || protocolo, // Priorizar custom si existe
+        protocoloCustom,
         title,
-        content,
+        content: processedContent, // Usar el contenido procesado
         userId,
         userName,
         metadata,
@@ -140,13 +158,19 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const reportType = searchParams.get('type');
+    const protocolo = searchParams.get('protocolo');
     const limit = parseInt(searchParams.get('limit') || '10');
 
     let query = db.select().from(reports);
-    
+
     // Filtrar por tipo si se proporciona
     if (reportType) {
       query = query.where(eq(reports.reportType, reportType)) as any;
+    }
+
+    // Filtrar por protocolo si se proporciona
+    if (protocolo) {
+      query = query.where(eq(reports.protocolo, protocolo)) as any;
     }
 
     const allReports = await query.limit(limit);

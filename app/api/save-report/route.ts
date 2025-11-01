@@ -5,7 +5,7 @@ import path from 'path';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { content, reportType, reportTypeValue, appendMode = false } = body;
+    const { content, reportType, reportTypeValue } = body;
 
     if (!content || content.trim() === '') {
       return NextResponse.json(
